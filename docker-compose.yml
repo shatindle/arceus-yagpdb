@@ -1,0 +1,65 @@
+version: '2'
+
+volumes:
+  db:
+  redis:
+  cert_cache:
+  soundboard:
+
+networks:
+  default:
+
+services:
+  app:
+    image: teyker/yagpdb:master-rootless
+    restart: unless-stopped
+    command:
+      - "/home/yagpdbbot/yagpdb"
+      - "-all"
+      - "-exthttps=true"
+      - "-https=false"
+    depends_on:
+      - redis
+      - db
+    networks:
+      - default
+    volumes:
+      - cert_cache:/home/yagpdbbot/cert
+      - soundboard:/home/yagpdbbot/soundboard
+    ports:
+      - '5009:5000'
+      - '5010:5001'
+    env_file:
+      - .env
+
+  redis:
+    image: redis
+    restart: unless-stopped
+    networks:
+      - default
+    volumes:
+      - redis:/data
+
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - '5011:80'
+    env_file:
+      - .env
+
+  backup-svc:
+    image: shatindle/yagpdb-backup-service:latest
+    restart: unless-stopped
+    env_file:
+      - .env
+
+  db:
+    image: postgres:11
+    restart: unless-stopped
+    volumes:
+      - db:/var/lib/postgresql/data
+    networks:
+      - default
+    env_file:
+      - .env

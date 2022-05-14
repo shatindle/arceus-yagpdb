@@ -1,0 +1,24 @@
+{
+  "name": "arceus-yagpdb",
+  "version": "1.0.0",
+  "description": "A self-hosted instance of yagpdb that includes a backup routine for the database",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shatindle/arceus-yagpdb.git"
+  },
+  "author": "shane#1353",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shatindle/arceus-yagpdb/issues"
+  },
+  "homepage": "https://github.com/shatindle/arceus-yagpdb#readme",
+  "dependencies": {
+    "discord.js": "^13.7.0",
+    "dotenv": "^16.0.1",
+    "pg": "^8.7.3"
+  }
+}
