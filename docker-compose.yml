@@ -43,6 +43,8 @@ services:
   pgadmin:
     image: dpage/pgadmin4
     restart: unless-stopped
+    networks:
+      - default
     ports:
       - '5011:80'
     env_file:
@@ -51,6 +53,8 @@ services:
   backup-svc:
     image: shatindle/yagpdb-backup-service:latest
     restart: unless-stopped
+    networks:
+      - default
     env_file:
       - .env
 
