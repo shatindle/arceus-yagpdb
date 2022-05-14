@@ -50,7 +50,7 @@ async function backup() {
 }
 
 client.once("ready", async () => {
-    setInterval(backup, 1000 * 60 * 60 * 24);
+    setInterval(backup, process.env.BACKUP_FREQUENCY ? parseInt(process.env.BACKUP_FREQUENCY) : 1000 * 60 * 60 * 24);
 
     // run it once right now
     await backup();
