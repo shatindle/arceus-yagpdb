@@ -34,10 +34,13 @@ async function backup() {
         const warnings = await extractWarnings();
 
         console.log(`${new Date().toISOString()}: Sending backup to server`);
-        const data = Buffer.from(warnings);
+        const data = Buffer.from(JSON.stringify(warnings));
 
         await backupChannel.send({
-            files: [data]
+            files: [{
+                attachment: data,
+                name: "warnings.json"
+            }]
         });
         console.log(`${new Date().toISOString()}: Backup sent successfully`);
     } catch (err) {
