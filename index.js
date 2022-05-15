@@ -88,8 +88,8 @@ client.on('messageCreate', async message => {
                 const username = message.member.user.username + "#" + message.member.user.discriminator;
 
                 // clean the string
-                let text = message.content.substring(message.content.indexOf(" "));
-                text = text.substring(text.indexOf(/\s+/));
+                let text = message.content.substring(message.content.indexOf(" ")).trim();
+                text = text.substring(text.indexOf(" ")).trim();
         
                 const now = new Date().toISOString();
 
@@ -111,7 +111,7 @@ client.on('messageCreate', async message => {
                             now,
                             message.guild.id,
                             userId,
-                            message.user.id,
+                            message.member.id,
                             username,
                             "NOTE: " + text
                         ]);
