@@ -68,7 +68,7 @@ client.on('messageCreate', async message => {
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
     if (message.content.trim().indexOf("-note ") === 0) {
-        const parts = message.content.split(/\w+/);
+        const parts = message.content.split(/\s+/);
 
         if (parts.length > 2) {
             let userId;
@@ -89,7 +89,7 @@ client.on('messageCreate', async message => {
 
                 // clean the string
                 let text = message.content.substring(message.content.indexOf(" "));
-                text = text.substring(text.indexOf(/\w+/));
+                text = text.substring(text.indexOf(/\s+/));
         
                 const now = new Date().toISOString();
 
