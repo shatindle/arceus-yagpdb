@@ -1,10 +1,11 @@
 //require("dotenv").config();
 const { Pool, Client } = require("pg");
-const { Client:Discord, Collection, Intents } = require('discord.js');
+const { Client:Discord, Intents, Permissions } = require('discord.js');
 
 const client = new Discord({ 
     intents: [
-        Intents.FLAGS.GUILDS
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES
     ], 
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'] 
 });
@@ -56,6 +57,77 @@ client.once("ready", async () => {
     await backup();
 });
 
-console.log(process.env);
+client.on('messageCreate', async message => {
+    // ignore direct messages
+    if (!message.guild) return;
+
+    // ignore posts from bots
+    if (message.author.bot) return;
+
+    // ignore posts from non-mods
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+
+    if (message.content.indexOf("-note ")) {
+        const parts = message.content.split(/\w+/);
+
+        if (parts.length > 2) {
+            let userId;
+
+            if (parts[1].match(/^\d+$/)) {
+                userId = parts[1];
+            } else if (parts[1].match(/^\<\#\d+\>$/)) {
+                userId = parts[1].replace("<#", "").replace(">","");
+            }
+
+            const user = await client.users.fetch(userId);
+
+            if (user && user.id) {
+                const username = message.member.user.username + "#" + message.member.user.discriminator;
+
+                // clean the string
+                let text = message.content.substring(message.content.indexOf(" "));
+                text = text.substring(text.indexOf(/\w+/));
+        
+                const now = new Date().toISOString();
+
+                try {
+                    // create the warning
+                    const client = new Client(credentials);
+                    await client.connect();
+                    await client.query(`INSERT INTO public.moderation_warnings(created_at, updated_at, guild_id, user_id, author_id, author_username_discrim, message, logs_link) VALUES (` +
+                        `?,` +  //   created_at = case.created_at
+                        `?,` + //   updated_at = case.created_at
+                        `?,` + //   guild_id = 725341600670023700
+                        `?,` + //   user_id = case.user_id
+                        `?,` + //   author_id = case.mod_id
+                        `?,` + //   author_username_discrim = case.mod_name
+                        `?,` + //   message = case.notes[0].body
+                        `'');`, //   logs_link = ''
+                        [
+                            now,
+                            now,
+                            message.guild.id,
+                            userId,
+                            message.user.id,
+                            username,
+                            "NOTE: " + text
+                        ]);
+                    await client.end();
+
+                    await message.channel.send("Note added");
+                } catch (err) {
+                    await message.channel.send("Error creating warning: " + err.toString());
+                }
+
+                return;
+            }
+
+            await message.channel.send("User not found");
+            return;
+        }
+    }
+
+    return;
+});
 
 client.login(process.env.YAGPDB_BOTTOKEN.substring("Bot ".length));
