@@ -77,6 +77,9 @@ client.on('messageCreate', async message => {
                 userId = parts[1];
             } else if (parts[1].match(/^\<\#\d+\>$/)) {
                 userId = parts[1].replace("<#", "").replace(">","");
+            } else {
+                await message.channel.send("Please provide a valid user ID.  Example: `-note 972980501453365288 This is a note`");
+                return;
             }
 
             const user = await client.users.fetch(userId);
