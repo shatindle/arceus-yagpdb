@@ -109,7 +109,7 @@ client.on('messageCreate', async message => {
                         [
                             now,
                             now,
-                            message.guild.id,
+                            parseInt(message.guild.id),
                             userId,
                             message.member.id,
                             username,
@@ -119,7 +119,7 @@ client.on('messageCreate', async message => {
 
                     await message.channel.send("Note added");
                 } catch (err) {
-                    await message.channel.send("Error creating warning: " + err.toString());
+                    await message.channel.send("Error creating warning: " + err.toString() + " stack: " + err.stackß);
                 }
 
                 return;
