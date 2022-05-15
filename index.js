@@ -98,13 +98,13 @@ client.on('messageCreate', async message => {
                     const client = new Client(credentials);
                     await client.connect();
                     await client.query(`INSERT INTO public.moderation_warnings(created_at, updated_at, guild_id, user_id, author_id, author_username_discrim, message, logs_link) VALUES (` +
-                        `?,` +  //   created_at = case.created_at
-                        `?,` + //   updated_at = case.created_at
-                        `?,` + //   guild_id = 725341600670023700
-                        `?,` + //   user_id = case.user_id
-                        `?,` + //   author_id = case.mod_id
-                        `?,` + //   author_username_discrim = case.mod_name
-                        `?,` + //   message = case.notes[0].body
+                        `$1,` +  //   created_at = case.created_at
+                        `$2,` + //   updated_at = case.created_at
+                        `$3,` + //   guild_id = 725341600670023700
+                        `$4,` + //   user_id = case.user_id
+                        `$5,` + //   author_id = case.mod_id
+                        `$6,` + //   author_username_discrim = case.mod_name
+                        `$7,` + //   message = case.notes[0].body
                         `'');`, //   logs_link = ''
                         [
                             now,
