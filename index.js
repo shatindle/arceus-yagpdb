@@ -1,6 +1,7 @@
 //require("dotenv").config();
 const { Pool, Client } = require("pg");
-const { Client:Discord, Intents, Permissions } = require('discord.js');
+const { Client:Discord, Intents, Permissions, Collection } = require('discord.js');
+const fs = require('fs');
 
 const client = new Discord({ 
     intents: [
@@ -10,6 +11,28 @@ const client = new Discord({
     partials: ['MESSAGE', 'CHANNEL', 'REACTION'] 
 });
 
+client.commands = new Collection();
+const commandFiles = fs.readdirSync('./commands').filter(file => file.endsWith('.js'));
+
+for (const file of commandFiles) {
+	const command = require(`./commands/${file}`);
+	client.commands.set(command.data.name, command);
+}
+
+client.on('interactionCreate', async interaction => {
+	if (!interaction.isCommand()) return;
+
+	const command = client.commands.get(interaction.commandName);
+
+	if (!command) return;
+
+	try {
+		await command.execute(interaction);
+	} catch (error) {
+		console.error(error);
+		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+	}
+});
 
 const credentials = {
   user: process.env.YAGPDB_PQUSERNAME,
@@ -58,7 +81,13 @@ client.on('messageCreate', async message => {
     if (message.author.bot) return;
 
     // ignore posts from non-mods
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
+        const response = await message.channel.send("You need the MANAGE_MESSAGES permission to run this command");
+        setTimeout(async () => {
+            if (response.deletable) await response.delete();
+        }, 5000);
+        return;
+    }
 
     if (message.content.trim().indexOf("!note ") === 0) {
         const parts = message.content.split(/\s+/);
