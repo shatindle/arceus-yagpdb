@@ -1,5 +1,6 @@
 const { Permissions } = require("discord.js");
 const { SlashCommandBuilder } = require('@discordjs/builders');
+const { Client } = require("pg");
 
 const credentials = {
     user: process.env.YAGPDB_PQUSERNAME,
