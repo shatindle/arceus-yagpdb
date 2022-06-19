@@ -60,7 +60,7 @@ client.on('messageCreate', async message => {
     // ignore posts from non-mods
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
-    if (message.content.trim().indexOf("-note ") === 0) {
+    if (message.content.trim().indexOf("!note ") === 0) {
         const parts = message.content.split(/\s+/);
 
         if (parts.length > 2) {
