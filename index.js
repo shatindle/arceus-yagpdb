@@ -80,16 +80,8 @@ client.on('messageCreate', async message => {
     // ignore posts from bots
     if (message.author.bot) return;
 
-    return;
-
     // ignore posts from non-mods
-    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
-        const response = await message.channel.send("You need the MANAGE_MESSAGES permission to run this command");
-        setTimeout(async () => {
-            if (response.deletable) await response.delete();
-        }, 5000);
-        return;
-    }
+    if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
 
     if (message.content.trim().indexOf("!note ") === 0) {
         const parts = message.content.split(/\s+/);
