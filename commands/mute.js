@@ -13,7 +13,7 @@ const credentials = {
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('mute')
-		.setDescription('Create a note on a user.  Requires MANAGE_MESSAGES permission')
+		.setDescription('Mutes a member')
         .addUserOption(option =>
             option.setName("user")
                 .setDescription("User")
@@ -29,7 +29,7 @@ module.exports = {
 	async execute(interaction) {
         try {
             const user = interaction.options.getUser("user");
-            const text = interaction.options.getString("text");
+            const text = interaction.options.getString("reason");
             const hasPermission = interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES);
 
             if (hasPermission) {
@@ -56,7 +56,7 @@ module.exports = {
                             user.id,
                             interaction.member.user.id,
                             username,
-                            "**NOTE:** " + text,
+                            "**USER MUTED:** " + text,
                             ""//interaction.url
                         ]);
                     await client.end();
