@@ -80,6 +80,8 @@ client.on('messageCreate', async message => {
     // ignore posts from bots
     if (message.author.bot) return;
 
+    return;
+
     // ignore posts from non-mods
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) {
         const response = await message.channel.send("You need the MANAGE_MESSAGES permission to run this command");
