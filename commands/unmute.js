@@ -3,21 +3,17 @@ const auditInteraction = require("../logic/auditInteraction");
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('mute')
-		.setDescription('Mutes a member')
+		.setName('unmute')
+		.setDescription('Unmutes a member')
         .addUserOption(option =>
             option.setName("user")
                 .setDescription("User")
                 .setRequired(true))
         .addStringOption(option => 
-            option.setName("duration")
-                .setDescription("Duration")
-                .setRequired(false))
-        .addStringOption(option => 
             option.setName("reason")
                 .setDescription("Reason")
                 .setRequired(false)),
 	async execute(interaction) {
-        await auditInteraction(interaction, "USER MUTED");
+        await auditInteraction(interaction, "USER UNMUTED");
 	},
 };

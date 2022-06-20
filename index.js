@@ -73,6 +73,68 @@ async function backup() {
     }
 }
 
+async function auditAction(client, message, action) {
+    const parts = message.content.split(/\s+/);
+
+    if (parts.length > 2) {
+        let userId;
+
+        if (parts[1].match(/^\d+$/)) {
+            userId = parts[1];
+        } else if (parts[1].match(/^\<\#\d+\>$/)) {
+            userId = parts[1].replace("<#", "").replace(">","");
+        } else {
+            // user ID not valid, nothing to do
+            return;
+        }
+
+        const user = await client.users.fetch(userId);
+
+        if (user && user.id) {
+            const username = message.member.user.username + "#" + message.member.user.discriminator;
+
+            // clean the string
+            let text = message.content.substring(message.content.indexOf(" ")).trim();
+            text = text.substring(text.indexOf(" ")).trim();
+
+            const now = new Date().toISOString();
+
+            try {
+                // create the warning
+                const client = new Client(credentials);
+                await client.connect();
+                await client.query(`INSERT INTO public.moderation_warnings(created_at, updated_at, guild_id, user_id, author_id, author_username_discrim, message, logs_link) VALUES (` +
+                    `$1,` +  //   created_at = case.created_at
+                    `$2,` + //   updated_at = case.created_at
+                    `$3,` + //   guild_id = 725341600670023700
+                    `$4,` + //   user_id = case.user_id
+                    `$5,` + //   author_id = case.mod_id
+                    `$6,` + //   author_username_discrim = case.mod_name
+                    `$7,` + //   message = case.notes[0].body
+                    `$8);`, //   logs_link = ''
+                    [
+                        now,
+                        now,
+                        parseInt(message.guild.id),
+                        userId,
+                        message.member.id,
+                        username,
+                        `**${action.toUpperCase()}**: ${text}`,
+                        message.url
+                    ]);
+                await client.end();
+            } catch (err) {
+                await message.channel.send("Error creating mute log: " + err.toString() + " stack: " + err.stackß);
+            }
+
+            return;
+        }
+        // don't respond if this is being handled by the main function and isn't valid
+        
+        return;
+    }
+}
+
 client.on('messageCreate', async message => {
     // ignore direct messages
     if (!message.guild) return;
@@ -148,65 +210,13 @@ client.on('messageCreate', async message => {
             return;
         }
     } else if (trimmedMessage.indexOf("!mute ") === 0) {
-        const parts = message.content.split(/\s+/);
-
-        if (parts.length > 2) {
-            let userId;
-
-            if (parts[1].match(/^\d+$/)) {
-                userId = parts[1];
-            } else if (parts[1].match(/^\<\#\d+\>$/)) {
-                userId = parts[1].replace("<#", "").replace(">","");
-            } else {
-                // user ID not valid, nothing to do
-                return;
-            }
-
-            const user = await client.users.fetch(userId);
-
-            if (user && user.id) {
-                const username = message.member.user.username + "#" + message.member.user.discriminator;
-
-                // clean the string
-                let text = message.content.substring(message.content.indexOf(" ")).trim();
-                text = text.substring(text.indexOf(" ")).trim();
-
-                const now = new Date().toISOString();
-
-                try {
-                    // create the warning
-                    const client = new Client(credentials);
-                    await client.connect();
-                    await client.query(`INSERT INTO public.moderation_warnings(created_at, updated_at, guild_id, user_id, author_id, author_username_discrim, message, logs_link) VALUES (` +
-                        `$1,` +  //   created_at = case.created_at
-                        `$2,` + //   updated_at = case.created_at
-                        `$3,` + //   guild_id = 725341600670023700
-                        `$4,` + //   user_id = case.user_id
-                        `$5,` + //   author_id = case.mod_id
-                        `$6,` + //   author_username_discrim = case.mod_name
-                        `$7,` + //   message = case.notes[0].body
-                        `$8);`, //   logs_link = ''
-                        [
-                            now,
-                            now,
-                            parseInt(message.guild.id),
-                            userId,
-                            message.member.id,
-                            username,
-                            "**USER MUTED**: " + text,
-                            message.url
-                        ]);
-                    await client.end();
-                } catch (err) {
-                    await message.channel.send("Error creating mute log: " + err.toString() + " stack: " + err.stackß);
-                }
-
-                return;
-            }
-            // don't respond if this is being handled by the main function and isn't valid
-            
-            return;
-        }
+        await auditAction(client, message, "USER MUTED");
+    } else if (trimmedMessage.indexOf("!unmute ") === 0) {
+        await auditAction(client, message, "USER UNMUTED");
+    } else if (trimmedMessage.indexOf("!ban ") === 0) {
+        await auditAction(client, message, "USER BANNED");
+    } else if (trimmedMessage.indexOf("!unban ") === 0) {
+        await auditAction(client, message, "USER UNBANNED");
     }
 
     return;
