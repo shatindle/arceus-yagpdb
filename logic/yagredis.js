@@ -6,6 +6,10 @@ redisClient.on('error', (err) => {
     console.log('Error occured while connecting or accessing redis server');
 });
 
+async function load() {
+    if (!redisClient.isOpen) await redisClient.connect();
+}
+
 async function getServerPrefix(guildId) {
     const prefix = await redisClient.get(`command_prefix:${guildId}`);
 
@@ -24,6 +28,7 @@ async function getBackupChannel(guildId) {
 }
 
 module.exports = {
+    load,
     getServerPrefix,
     setBackupChannel,
     getBackupChannel

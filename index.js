@@ -2,7 +2,7 @@
 const { Pool, Client } = require("pg");
 const { Client:Discord, Intents, Permissions, Collection } = require('discord.js');
 const fs = require('fs');
-const { getServerPrefix, getBackupChannel } = require("./logic/yagredis");
+const { load, getServerPrefix, getBackupChannel } = require("./logic/yagredis");
 
 const client = new Discord({ 
     intents: [
@@ -53,6 +53,8 @@ async function extractWarnings(guild) {
 }
 
 async function backup() {
+    await load();
+
     const allGuilds = [];
     client.guilds.cache.forEach(guild => allGuilds.push(guild.id));
 
@@ -239,6 +241,7 @@ client.on('messageCreate', async message => {
 });
 
 client.once("ready", async () => {
+    await load();
     setInterval(backup, process.env.BACKUP_FREQUENCY ? parseInt(process.env.BACKUP_FREQUENCY) : 1000 * 60 * 60 * 24);
 
     // run it once right now
