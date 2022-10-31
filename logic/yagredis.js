@@ -11,7 +11,9 @@ redisClient.on('error', (err) => {
 
 async function load() {
     console.log("connecting to redis");
-    await redisClient.connect();
+    try {
+        await redisClient.connect();
+    } catch {}
 }
 
 async function getServerPrefix(guildId) {
