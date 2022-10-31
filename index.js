@@ -60,6 +60,8 @@ async function backup() {
 
     for (var guild of allGuilds) {
         let backupChannel = await getBackupChannel(guild);
+        console.log("Got backup channel:");
+        console.log(backupChannel);
 
         if (backupChannel) {
             try {
