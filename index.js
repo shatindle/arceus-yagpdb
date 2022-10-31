@@ -66,7 +66,7 @@ async function backup() {
 
         if (backupChannelId) {
             try {
-                let backupChannel = await client.channels.fetch(backupChannel);
+                let backupChannel = await client.channels.fetch(backupChannelId);
                 try {
                     console.log(`${new Date().toISOString()}: Running backup routine`);
                     const warnings = await extractWarnings(guild);
