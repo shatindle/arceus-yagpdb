@@ -10,6 +10,7 @@ redisClient.on('error', (err) => {
 });
 
 async function load() {
+    console.log("connecting to redis");
     await redisClient.connect();
 }
 
