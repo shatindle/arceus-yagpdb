@@ -59,6 +59,7 @@ async function backup() {
     client.guilds.cache.forEach(guild => allGuilds.push(guild.id));
 
     for (var guild of allGuilds) {
+        console.log(guild);
         let backupChannel = await getBackupChannel(guild);
         console.log("Got backup channel:");
         console.log(backupChannel);

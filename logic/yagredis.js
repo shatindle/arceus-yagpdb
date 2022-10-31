@@ -32,7 +32,10 @@ async function setBackupChannel(guildId, channelId) {
 }
 
 async function getBackupChannel(guildId) {
+    console.log(`backup_channel:${guildId}`);
     const channel = await redisClient.get(`backup_channel:${guildId}`);
+
+    console.log(channel);
 
     return channel;
 }
