@@ -1,8 +1,7 @@
 const redis = require('redis');
 
 const redisClient = redis.createClient({
-    host: process.env.YAGPDB_REDIS.split(':')[0],
-    port: parseInt(process.env.YAGPDB_REDIS.split(':')[1])
+    url: `redis://${process.env.YAGPDB_REDIS}`
 });
 
 redisClient.on('error', (err) => {
