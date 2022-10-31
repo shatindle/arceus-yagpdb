@@ -1,6 +1,9 @@
 const redis = require('redis');
 
-const redisClient = redis.createClient(6379,'127.0.0.1');
+const redisClient = redis.createClient({
+    host: process.env.YAGPDB_REDIS.split(':')[0],
+    port: parseInt(process.env.YAGPDB_REDIS.split(':')[1])
+});
 
 redisClient.on('error', (err) => {
     console.log('Error occured while connecting or accessing redis server');
