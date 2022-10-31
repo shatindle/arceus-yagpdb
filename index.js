@@ -134,7 +134,7 @@ async function auditAction(client, message, action) {
                     [
                         now,
                         now,
-                        parseInt(message.guild.id),
+                        BigInt(message.guild.id),
                         userId,
                         message.member.id,
                         username,
@@ -210,7 +210,7 @@ client.on('messageCreate', async message => {
                         [
                             now,
                             now,
-                            parseInt(message.guild.id),
+                            BigInt(message.guild.id),
                             userId,
                             message.member.id,
                             username,

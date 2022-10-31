@@ -35,7 +35,7 @@ async function auditInteraction(interaction, action) {
                     [
                         now,
                         now,
-                        parseInt(interaction.guild.id),
+                        BigInt(interaction.guild.id),
                         user.id,
                         interaction.member.user.id,
                         username,

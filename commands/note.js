@@ -1,4 +1,4 @@
-const { Permissions } = require("discord.js");
+const { Permissions, Interaction } = require("discord.js");
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const { Client } = require("pg");
 
@@ -22,6 +22,11 @@ module.exports = {
             option.setName("text")
                 .setDescription("The note to record")
                 .setRequired(true)),
+    /**
+     * 
+     * @param {Interaction} interaction 
+     * @returns 
+     */
 	async execute(interaction) {
         try {
             const user = interaction.options.getUser("user");
@@ -48,7 +53,7 @@ module.exports = {
                         [
                             now,
                             now,
-                            parseInt(interaction.guild.id),
+                            BigInt(interaction.guild.id),
                             user.id,
                             interaction.member.user.id,
                             username,
