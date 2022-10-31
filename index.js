@@ -2,6 +2,7 @@
 const { Pool, Client } = require("pg");
 const { Client:Discord, Intents, Permissions, Collection } = require('discord.js');
 const fs = require('fs');
+const { getServerPrefix, getBackupChannel } = require("./logic/yagredis");
 
 const client = new Discord({ 
     intents: [
@@ -42,34 +43,47 @@ const credentials = {
   port: 5432,
 };
 
-async function extractWarnings() {
+async function extractWarnings(guild) {
     const client = new Client(credentials);
     await client.connect();
-    const moderation_warnings = await client.query("SELECT * FROM moderation_warnings");
+    const moderation_warnings = await client.query(`SELECT * FROM moderation_warnings WHERE guild_id = ${guild}`);
     await client.end();
   
     return moderation_warnings.rows;
 }
 
 async function backup() {
-    const backupChannel = await client.channels.fetch(process.env.BACKUP_SVC_CHANNEL);
-    try {
-        console.log(`${new Date().toISOString()}: Running backup routine`);
-        const warnings = await extractWarnings();
+    const allGuilds = [];
+    client.guilds.cache.forEach(guild => allGuilds.push(guild.id));
 
-        console.log(`${new Date().toISOString()}: Sending backup to server`);
-        const data = Buffer.from(JSON.stringify(warnings));
+    for (var guild of allGuilds) {
+        let backupChannel = await getBackupChannel(guild);
 
-        await backupChannel.send({
-            files: [{
-                attachment: data,
-                name: "warnings.json"
-            }]
-        });
-        console.log(`${new Date().toISOString()}: Backup sent successfully`);
-    } catch (err) {
-        console.log(`${new Date().toISOString()}: Error creating backup`);
-        await backupChannel.send(`Unable to send backup file: ${err.toString()}`);
+        if (backupChannel) {
+            try {
+                let backupChannel = await client.channels.fetch(backupChannel);
+                try {
+                    console.log(`${new Date().toISOString()}: Running backup routine`);
+                    const warnings = await extractWarnings(guild);
+            
+                    console.log(`${new Date().toISOString()}: Sending backup to server`);
+                    const data = Buffer.from(JSON.stringify(warnings));
+            
+                    await backupChannel.send({
+                        files: [{
+                            attachment: data,
+                            name: "warnings.json"
+                        }]
+                    });
+                    console.log(`${new Date().toISOString()}: Backup sent successfully`);
+                } catch (err) {
+                    console.log(`${new Date().toISOString()}: Error creating backup`);
+                    await backupChannel.send(`Unable to send backup file: ${err.toString()}`);
+                }
+            } catch (err_wrap) {
+                console.log(`Unable to send backup or warning: ${err_wrap.toString()}`);
+            }
+        }
     }
 }
 
@@ -147,7 +161,9 @@ client.on('messageCreate', async message => {
 
     const trimmedMessage = message.content.trim();
 
-    if (trimmedMessage.indexOf("!note ") === 0) {
+    const prefix = await getServerPrefix(message.guild.id);
+
+    if (trimmedMessage.indexOf(`${prefix}note `) === 0) {
         const parts = message.content.split(/\s+/);
 
         if (parts.length > 2) {
@@ -209,13 +225,13 @@ client.on('messageCreate', async message => {
             await message.channel.send("User not found");
             return;
         }
-    } else if (trimmedMessage.indexOf("!mute ") === 0) {
+    } else if (trimmedMessage.indexOf(`${prefix}mute `) === 0) {
         await auditAction(client, message, "USER MUTED");
-    } else if (trimmedMessage.indexOf("!unmute ") === 0) {
+    } else if (trimmedMessage.indexOf(`${prefix}unmute `) === 0) {
         await auditAction(client, message, "USER UNMUTED");
-    } else if (trimmedMessage.indexOf("!ban ") === 0) {
+    } else if (trimmedMessage.indexOf(`${prefix}ban `) === 0) {
         await auditAction(client, message, "USER BANNED");
-    } else if (trimmedMessage.indexOf("!unban ") === 0) {
+    } else if (trimmedMessage.indexOf(`${prefix}unban `) === 0) {
         await auditAction(client, message, "USER UNBANNED");
     }
 
