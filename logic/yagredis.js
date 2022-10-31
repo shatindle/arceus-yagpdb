@@ -23,6 +23,10 @@ async function getServerPrefix(guildId) {
 }
 
 async function setBackupChannel(guildId, channelId) {
+    console.log(`backup_channel:${guildId}`);
+    console.log(channelId);
+    console.log(typeof channelId);
+
     if (channelId) await redisClient.set(`backup_channel:${guildId}`, channelId);
     else await redisClient.del(`backup_channel:${guildId}`);
 }
