@@ -55,6 +55,9 @@ services:
     restart: unless-stopped
     networks:
       - default
+    depends_on:
+      - redis
+      - db
     env_file:
       - .env
 
