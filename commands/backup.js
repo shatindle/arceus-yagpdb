@@ -1,6 +1,5 @@
 const { Permissions } = require("discord.js");
 const { SlashCommandBuilder } = require('@discordjs/builders');
-const { ChannelTypes } = require("discord.js/typings/enums");
 const { setBackupChannel } = require("../logic/yagredis");
 
 module.exports = {
@@ -11,7 +10,7 @@ module.exports = {
             option.setName("channel")
                 .setDescription("The channel for storing backups, leave blank to disable backups")
                 .setRequired(false)
-                .addChannelTypes(ChannelTypes.GUILD_TEXT)),
+                .addChannelTypes(/*ChannelTypes.GUILD_TEXT*/ 0)),
 	async execute(interaction) {
         try {
             const channel = interaction.options.getChannel("channel");
