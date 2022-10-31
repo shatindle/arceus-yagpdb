@@ -7,6 +7,7 @@ const redisClient = redis.createClient({
 
 redisClient.on('error', (err) => {
     console.log('Error occured while connecting or accessing redis server');
+    console.log(err);
 });
 
 async function load() {
