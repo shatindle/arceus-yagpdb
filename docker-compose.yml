@@ -11,21 +11,26 @@ networks:
 
 services:
   app:
-    image: teyker/yagpdb:master-rootless
+          #image: teyker/yagpdb:master-rootless
+    image: shatindle/yagpdb-arceus:latest
     restart: unless-stopped
-    command:
-      - "/home/yagpdbbot/yagpdb"
-      - "-all"
-      - "-exthttps=true"
-      - "-https=false"
+    stdin_open: true
+    tty: true
+    #command:
+            #- "/home/yagpdbbot/yagpdb"
+            #- "-all"
+            #- "-exthttps=true"
+            #- "-https=false"
     depends_on:
       - redis
       - db
     networks:
       - default
     volumes:
-      - cert_cache:/home/yagpdbbot/cert
-      - soundboard:/home/yagpdbbot/soundboard
+            #- cert_cache:/home/yagpdbbot/cert
+      - cert_cache:/cert
+        #- soundboard:/home/yagpdbbot/soundboard
+      - soundboard:/soundboard
     ports:
       - '5009:5000'
       - '5010:5001'
