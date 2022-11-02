@@ -157,8 +157,8 @@ async function auditAction(client, message, action) {
 async function auditAutoMod(message) {
     try {
         const userId = message.author.id;
-        const username = message.author.username + "#" + message.author.discriminator;
-        const authorId = null;
+        const username = "AutoMod";
+        const authorId = "no ID";
         const hasTimeout = message.embeds[0].fields.filter(t => t.name === "timeout_duration").length > 0;
         const reason = hasTimeout ? "**AUTOMOD TIMEOUT**: " : "**AUTOMOD**: ";
         // NOT USED, BUT COULD BE: const originalMessage = message.embeds[0].description;
