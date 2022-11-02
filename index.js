@@ -154,12 +154,64 @@ async function auditAction(client, message, action) {
     }
 }
 
+async function auditAutoMod(message) {
+    try {
+        const userId = message.author.id;
+        const username = message.author.username + "#" + message.author.discriminator;
+        const authorId = null;
+        const hasTimeout = message.embeds[0].fields.filter(t => t.name === "timeout_duration").length > 0;
+        const reason = hasTimeout ? "**AUTOMOD TIMEOUT**: " : "**AUTOMOD**: ";
+        // NOT USED, BUT COULD BE: const originalMessage = message.embeds[0].description;
+        const flaggedWordQuery = message.embeds[0].fields.filter(t => t.name === "keyword_matched_content");
+
+        let flaggedWord = "";
+
+        if (flaggedWordQuery && flaggedWordQuery.length > 0) 
+            flaggedWord = flaggedWordQuery[0].value;
+
+        const now = new Date().toISOString();
+
+        // create the warning
+        const client = new Client(credentials);
+        await client.connect();
+        await client.query(`INSERT INTO public.moderation_warnings(created_at, updated_at, guild_id, user_id, author_id, author_username_discrim, message, logs_link) VALUES (` +
+            `$1,` +  //   created_at = case.created_at
+            `$2,` + //   updated_at = case.created_at
+            `$3,` + //   guild_id = 725341600670023700
+            `$4,` + //   user_id = case.user_id
+            `$5,` + //   author_id = case.mod_id
+            `$6,` + //   author_username_discrim = case.mod_name
+            `$7,` + //   message = case.notes[0].body
+            `$8);`, //   logs_link = ''
+            [
+                now,
+                now,
+                BigInt(message.guild.id),
+                userId,
+                authorId,
+                username,
+                `${reason}flagged word: ${flaggedWord}`,
+                message.url
+            ]);
+        await client.end();
+    } catch (err) {
+        // silently fail
+        console.log(`Unable to record AutoMod warning: ${err.toString()}; stack: ${err.stackß}`);
+    }
+}
+
 client.on('messageCreate', async message => {
     // ignore direct messages
     if (!message.guild) return;
 
     // ignore posts from bots
     if (message.author.bot) return;
+
+    // check if this is an automod message
+    if (message.embeds !== null && message.embeds.length > 0 && message.embeds[0].type === "auto_moderation_message") {
+        await auditAutoMod(message);
+        return;
+    }
 
     // ignore posts from non-mods
     if (!message.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES)) return;
