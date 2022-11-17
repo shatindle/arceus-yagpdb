@@ -209,7 +209,8 @@ client.on('messageCreate', async message => {
 
     // check if this is an automod message
     if (message.embeds !== null && message.embeds.length > 0 && message.embeds[0].type === "auto_moderation_message") {
-        await auditAutoMod(message);
+        // one server opted out of automod logging in warns
+        if (message.guild.id !== "663661005514997770") await auditAutoMod(message);
         return;
     }
 
@@ -235,7 +236,10 @@ client.on('messageCreate', async message => {
                 return;
             }
 
-            const user = await client.users.fetch(userId);
+            let user;
+            try {
+                user = await client.users.fetch(userId);
+            } catch (user_lookup_err) { /* ignore for now */ }
 
             if (user && user.id) {
                 const username = message.member.user.username + "#" + message.member.user.discriminator;
@@ -271,7 +275,7 @@ client.on('messageCreate', async message => {
                         ]);
                     await client.end();
 
-                    await message.channel.send("Note added");
+                    await message.channel.send(`Note added for <@${user.id}>`);
                 } catch (err) {
                     await message.channel.send("Error creating warning: " + err.toString() + " stack: " + err.stackß);
                 }
