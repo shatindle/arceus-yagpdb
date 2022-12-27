@@ -34,7 +34,7 @@ module.exports = {
             const hasPermission = interaction.member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES);
 
             if (hasPermission) {
-                const username = user.username + "#" + user.discriminator;
+                const username = interaction.member.user.username + "#" + interaction.member.user.discriminator;
                 const now = new Date().toISOString();
 
                 try {
