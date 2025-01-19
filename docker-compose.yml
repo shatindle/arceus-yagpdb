@@ -1,4 +1,4 @@
-version: '2'
+version: '3'
 
 volumes:
   db:
@@ -11,25 +11,27 @@ networks:
 
 services:
   app:
-          #image: teyker/yagpdb:master-rootless
-    image: shatindle/yagpdb-arceus:latest
+    build:
+      context: ../yagpdb
+      dockerfile: Dockerfile
     restart: unless-stopped
     stdin_open: true
     tty: true
-    #command:
-            #- "/home/yagpdbbot/yagpdb"
-            #- "-all"
-            #- "-exthttps=true"
-            #- "-https=false"
+    command:
+      - "/app/yagpdb"
+      - "-all"
+      - "-pa"
+      - "-exthttps=false"
+      - "-https=true"
     depends_on:
       - redis
       - db
     networks:
       - default
     volumes:
-            #- cert_cache:/home/yagpdbbot/cert
+      #- cert_cache:/home/yagpdbbot/cert
       - cert_cache:/cert
-        #- soundboard:/home/yagpdbbot/soundboard
+      #- soundboard:/home/yagpdbbot/soundboard
       - soundboard:/soundboard
     ports:
       - '5009:5000'
@@ -56,7 +58,9 @@ services:
       - .env
 
   backup-svc:
-    image: shatindle/yagpdb-backup-service:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
     restart: unless-stopped
     networks:
       - default
