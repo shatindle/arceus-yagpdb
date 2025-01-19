@@ -13,7 +13,7 @@ services:
   app:
     build:
       context: ../yagpdb
-      dockerfile: ./yagpdb_docker/Dockerfile
+      dockerfile: ../arceus-yagpdb/Dockerfile.yagpdb
     restart: unless-stopped
     stdin_open: true
     tty: true
