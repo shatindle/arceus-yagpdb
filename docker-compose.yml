@@ -79,3 +79,13 @@ services:
       - default
     env_file:
       - .env
+  app-tunnel:
+    image: cloudflare/cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    networks:
+      - default
+    env_file:
+      - cloudflare.env
+    depends_on:
+      - app
