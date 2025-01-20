@@ -17,12 +17,12 @@ services:
     restart: unless-stopped
     stdin_open: true
     tty: true
-    command:
-      - "/app/yagpdb"
-      - "-all"
-      - "-pa"
-      - "-exthttps=false"
-      - "-https=true"
+    # command:
+    #   - "/app/yagpdb"
+    #   - "-all"
+    #   - "-pa"
+    #   - "-exthttps=false"
+    #   - "-https=true"
     depends_on:
       - redis
       - db
